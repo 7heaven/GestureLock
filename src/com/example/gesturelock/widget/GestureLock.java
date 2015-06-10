@@ -286,4 +286,22 @@ public class GestureLock extends RelativeLayout{
 		
 		if(gesturesContainer[0] != -1) canvas.drawLine(lastPathX, lastPathY, lastX, lastY, paint);
 	}
+	
+	/**
+	 * clear Gesture
+	 */
+	public void clearGestureLock(){
+		
+		unmatchedCount = 0;
+		touchable = true;
+		
+		for(int k : gesturesContainer){
+			View selectedChild = findViewById(k + 1);
+			if(selectedChild != null && selectedChild instanceof GestureLockView){
+				((GestureLockView) selectedChild).setMode(GestureLockView.MODE_NORMAL);
+			}
+		}
+		gesturePath = null;
+		invalidate();
+	}
 }
