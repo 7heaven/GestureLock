@@ -13,6 +13,7 @@ import com.example.gesturelock.widget.GestureLock.OnGestureEventListener;
 public class MainActivity extends Activity {
 
 	private GestureLock gestureView;
+	private String gestureStr ="";
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +28,10 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onGestureEvent(boolean matched) {
+				Log.e("gestureStr", gestureStr);
 				Toast.makeText(MainActivity.this, "Match:" + matched, Toast.LENGTH_SHORT).show();
+				gestureView.clearGestureLock();
+				gestureStr = "";
 			}
 
 			@Override
@@ -46,6 +50,7 @@ public class MainActivity extends Activity {
 
 			@Override
 			public void onBlockSelected(int position) {
+				gestureStr+=position+",";
 				Log.d("position", position + "");
 			}
 			
