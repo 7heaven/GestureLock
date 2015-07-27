@@ -193,12 +193,22 @@ public class GestureLock extends RelativeLayout{
 				
 				if(gesturesContainer[0] != -1){
 					boolean matched = false;
-					for(int j = 0; j < defaultGestures.length; j++){
-						if(gesturesContainer[j] == defaultGestures[j]){
-							matched = true;
-						}else{
-							matched = false;
-							break;
+                                        int effectSize = 0;
+					for (int p : gesturesContainer) {
+						if(p!=-1){
+							effectSize++;
+						}
+					}
+					if(effectSize!=defaultGestures.length){
+						matched = false;
+					}else{
+						for(int j = 0; j < defaultGestures.length; j++){
+							if(gesturesContainer[j] == defaultGestures[j]){
+								matched = true;
+							}else{
+								matched = false;
+								break;
+							}
 						}
 					}
 					
