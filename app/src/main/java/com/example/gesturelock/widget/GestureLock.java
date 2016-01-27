@@ -18,9 +18,9 @@ public class GestureLock extends RelativeLayout{
 	
 	private int mode = MODE_NORMAL;
 	
-	private static final int depth = 3;
+	private int depth = 3;
 	
-	private int[] defaultGestures = new int[]{0, 1, 2, 4, 6};
+	private int[] defaultGestures = new int[]{0};
 	private int[] negativeGestures;
 	
 	private int[] gesturesContainer;
@@ -41,16 +41,24 @@ public class GestureLock extends RelativeLayout{
 	private Paint paint;
 	
 	private int unmatchedCount;
-	private static final int unmatchedBoundary = 5;
+	private int unmatchedBoundary = 5;
 	
 	private boolean touchable;
 	
 	private OnGestureEventListener onGestureEventListener;
+	private GestureLockAdapter mAdapter;
 	
 	public interface OnGestureEventListener{
 		public void onBlockSelected(int position);
 		public void onGestureEvent(boolean matched);
 		public void onUnmatchedExceedBoundary();
+	}
+
+	public interface GestureLockAdapter{
+		public int getDepth();
+		public int[] getDefaultGestures();
+		public int getUnmatchedBoundary();
+		public GestureLockView getGestureLockViewInstance(Context context);
 	}
 
 	public GestureLock(Context context){
@@ -78,6 +86,23 @@ public class GestureLock extends RelativeLayout{
 		
 		touchable = true;
 	}
+
+	public void setAdapter(GestureLockAdapter adapter){
+		mAdapter = adapter;
+
+		if(mAdapter != null){
+			this.depth = mAdapter.getDepth();
+			negativeGestures = new int[depth * depth];
+			for(int i = 0; i < negativeGestures.length; i++) negativeGestures[i] = -1;
+			gesturesContainer = negativeGestures.clone();
+
+			defaultGestures = mAdapter.getDefaultGestures();
+
+			unmatchedBoundary = mAdapter.getUnmatchedBoundary();
+
+			requestLayout();
+		}
+	}
 	
 	public void setTouchable(boolean touchable){
 		this.touchable = touchable;
@@ -100,29 +125,60 @@ public class GestureLock extends RelativeLayout{
 		
 		int length = width > height ? height : width;
 		
-		if(lockers == null){
-			blockWidth = (length - (blockGap * (depth - 1))) / depth;
-			gestureWidth = blockWidth * depth + blockGap * (depth - 1);
-			lockers = new GestureLockView[depth * depth];
-			for(int i = 0; i < lockers.length; i++){
-				lockers[i] = new GestureLockView(getContext());
-				lockers[i].setId(i + 1);
-				
-				RelativeLayout.LayoutParams lockerParams = new RelativeLayout.LayoutParams(blockWidth, blockWidth);
-				if(i % depth != 0) lockerParams.addRule(RelativeLayout.RIGHT_OF, lockers[i - 1].getId());
-				if(i > (depth - 1)) lockerParams.addRule(RelativeLayout.BELOW, lockers[i - depth].getId());
-				int rightMargin = 0;
-				int bottomMargin = 0;
-				if((i + 1) % depth != 0) rightMargin = blockGap;
-				if(i < depth * (depth - 1)) bottomMargin = blockGap;
-				
-				lockerParams.setMargins(0, 0, rightMargin, bottomMargin);
-				
-				addView(lockers[i], lockerParams);
-				
-				lockers[i].setMode(GestureLockView.MODE_NORMAL);
+		if(mAdapter != null){
+			if((lockers != null && lockers.length != depth * depth) || lockers == null){
+
+				for(int i = 0; i < getChildCount(); i++){
+					removeViewAt(i);
+				}
+
+				blockWidth = (length - (blockGap * (depth - 1))) / depth;
+				gestureWidth = blockWidth * depth + blockGap * (depth - 1);
+				lockers = new GestureLockView[depth * depth];
+				for(int i = 0; i < lockers.length; i++){
+					lockers[i] = mAdapter.getGestureLockViewInstance(getContext());
+					lockers[i].setId(i + 1);
+
+					RelativeLayout.LayoutParams lockerParams = new RelativeLayout.LayoutParams(blockWidth, blockWidth);
+					if(i % depth != 0) lockerParams.addRule(RelativeLayout.RIGHT_OF, lockers[i - 1].getId());
+					if(i > (depth - 1)) lockerParams.addRule(RelativeLayout.BELOW, lockers[i - depth].getId());
+					int rightMargin = 0;
+					int bottomMargin = 0;
+					if((i + 1) % depth != 0) rightMargin = blockGap;
+					if(i < depth * (depth - 1)) bottomMargin = blockGap;
+
+					lockerParams.setMargins(0, 0, rightMargin, bottomMargin);
+
+					addView(lockers[i], lockerParams);
+
+					lockers[i].setLockerState(GestureLockView.LockerState.LOCKER_STATE_NORMAL);
+				}
 			}
 		}
+	}
+
+	public void setDepth(int depth){
+		this.depth = depth;
+
+		negativeGestures = new int[depth * depth];
+		for(int i = 0; i < negativeGestures.length; i++) negativeGestures[i] = -1;
+		gesturesContainer = negativeGestures.clone();
+
+		clear();
+		requestLayout();
+	}
+
+	public void clear(){
+		for(int i = 0; i < getChildCount(); i++) {
+			View c = getChildAt(i);
+			if(c instanceof GestureLockView){
+				((GestureLockView) c).setLockerState(GestureLockView.LockerState.LOCKER_STATE_NORMAL);
+				((GestureLockView) c).setArrow(-1);
+			}
+		}
+
+		gesturePath = null;
+		invalidate();
 	}
 	
 	@Override
@@ -130,10 +186,11 @@ public class GestureLock extends RelativeLayout{
 		if(touchable){
 			switch(event.getActionMasked()){
 			case MotionEvent.ACTION_DOWN:
-				for(int i = 0; i < getChildCount(); i++){
+				for(int i = 0; i < getChildCount(); i++) {
 					View c = getChildAt(i);
-					if(c instanceof GestureLockView){
-						((GestureLockView) c).setMode(GestureLockView.MODE_NORMAL);
+					if (c instanceof GestureLockView){
+						((GestureLockView) c).setLockerState(GestureLockView.LockerState.LOCKER_STATE_NORMAL);
+						((GestureLockView) c).setArrow(-1);
 					}
 				}
 				
@@ -164,7 +221,7 @@ public class GestureLock extends RelativeLayout{
 				}
 				
 				if(child != null && child instanceof GestureLockView && checkChildInCoords(lastX, lastY, child)){
-					((GestureLockView) child).setMode(GestureLockView.MODE_SELECTED);
+					((GestureLockView) child).setLockerState(GestureLockView.LockerState.LOCKER_STATE_SELECTED);
 					
 					if(!checked){
 						int checkedX = child.getLeft() + child.getWidth() / 2;
@@ -207,7 +264,18 @@ public class GestureLock extends RelativeLayout{
 						for(int k : gesturesContainer){
 							View selectedChild = findViewById(k + 1);
 							if(selectedChild != null && selectedChild instanceof GestureLockView){
-								((GestureLockView) selectedChild).setMode(GestureLockView.MODE_ERROR);
+								((GestureLockView) selectedChild).setLockerState(GestureLockView.LockerState.LOCKER_STATE_ERROR);
+
+								if(k < gesturesContainer.length - 1 && gesturesContainer[k + 1] != -1){
+									View nextChild = findViewById(gesturesContainer[k + 1] + 1);
+									if(nextChild != null){
+										int dx = nextChild.getLeft() - selectedChild.getLeft();
+										int dy = nextChild.getTop() - selectedChild.getTop();
+
+										int angle = (int) Math.toDegrees(Math.atan2(dy, dx)) + 90;
+										((GestureLockView) selectedChild).setArrow(angle);
+									}
+								}
 							}
 						}
 					}else{

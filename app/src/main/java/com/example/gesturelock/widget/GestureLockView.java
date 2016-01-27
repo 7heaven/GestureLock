@@ -9,22 +9,15 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-public class GestureLockView extends View{
-	
-	public static final int MODE_NORMAL = 0x100;
-	public static final int MODE_SELECTED = 0x200;
-	public static final int MODE_ERROR = 0x400;
-	
-	public static final int ARROW_TOP = 0x1;
-	public static final int ARROW_TOP_RIGHT = 0x2;
-	public static final int ARROW_RIGHT = 0x4;
-	public static final int ARROW_RIGHT_BOTTOM = 0x8;
-	public static final int ARROW_BOTTOM = 0x10;
-	public static final int ARROW_BOTTOM_LEFT = 0x20;
-	public static final int ARROW_LEFT = 0x40;
-	public static final int ARROW_LEFT_TOP = 0x80;
-	
-	private int mode = MODE_NORMAL;
+public abstract class GestureLockView extends View{
+
+	public enum LockerState{
+		LOCKER_STATE_NORMAL, LOCKER_STATE_ERROR, LOCKER_STATE_SELECTED
+	}
+
+	private LockerState mState = LockerState.LOCKER_STATE_NORMAL;
+
+	private int errorArrow = -1;
 	
 	private int width;
 	private int height;
@@ -34,13 +27,7 @@ public class GestureLockView extends View{
 	
 	private Paint paint;
 	
-	private static final int COLOR_NORMAL = 0xFFFFFFFF;
-	private static final int COLOR_ERROR = 0xFFFF0000;
-	
 	private int radius;
-	private float innerRate = 0.2F;
-	private float outerWidthRate = 0.15F;
-	private float outerRate = 0.91F;
 	private float arrowRate = 0.25F;
 	private float arrowDistanceRate = 0.0F;
 	private int arrowDistance;
@@ -60,102 +47,76 @@ public class GestureLockView extends View{
 		
 		paint = new Paint(Paint.ANTI_ALIAS_FLAG);
 	}
-	
+
 	@Override
-	protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
-		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-		
-		width = MeasureSpec.getSize(widthMeasureSpec);
-		height = MeasureSpec.getSize(heightMeasureSpec);
-		
+	protected void onSizeChanged(int w, int h, int oldw, int oldh){
+		super.onSizeChanged(w, h, oldw, oldh);
+
+		width = w;
+		height = h;
+
 		centerX = width / 2;
 		centerY = height / 2;
-		
+
 		radius = width > height ? height : width;
 		radius /= 2;
-		
+
 		if(arrow == null){
 			arrowDistance = (int) (radius * arrowDistanceRate);
-			
-			int length = (int) (radius * arrowRate);
-			arrow = new Path();
-			arrow.moveTo(-length + centerX, length + centerY - arrowDistance);
-			arrow.lineTo(centerX, centerY - arrowDistance);
-			arrow.lineTo(length + centerX, length + centerY - arrowDistance);
-			arrow.close();
-			
+
+			arrow = getArrowShape(centerX, centerY);
+			if(arrow != null) arrow.offset(0, -arrowDistance);
+
 		}
+
 	}
 	
-	public void setMode(int mode){
-		this.mode = mode;
+	public void setLockerState(LockerState state){
+		mState = state;
 		invalidate();
 	}
 	
-	public int getMode(){
-		return mode;
+	public LockerState getLockerState(){
+		return mState;
 	}
+
+	public void setArrow(int arrow){
+		errorArrow = arrow;
+
+		invalidate();
+	}
+
+	public int getArrow(){
+		return errorArrow;
+	}
+
+	protected Path getArrowShape(int centerX, int centerY){
+
+		int length = (int) (radius * arrowRate);
+		Path arrowPath = new Path();
+		arrowPath.moveTo(-length + centerX, length + centerY);
+		arrowPath.lineTo(centerX, centerY);
+		arrowPath.lineTo(length + centerX, length + centerY);
+		arrowPath.close();
+
+		return arrowPath;
+	}
+
+	protected abstract void doDraw(LockerState state, Canvas canvas);
 	
 	@Override
 	public void onDraw(Canvas canvas){
-		switch(mode & 0xF00){
-		case MODE_NORMAL:
+
+		doDraw(mState, canvas);
+
+		if(errorArrow != -1 && arrow != null){
 			paint.setStyle(Paint.Style.FILL);
-			paint.setColor(COLOR_NORMAL);
-			canvas.drawCircle(centerX, centerY, radius * innerRate, paint);
-			break;
-		case MODE_SELECTED:
-			paint.setStyle(Paint.Style.STROKE);
-			paint.setColor(COLOR_NORMAL);
-			paint.setStrokeWidth(radius * outerWidthRate);
-			canvas.drawCircle(centerX, centerY, radius * outerRate, paint);
-			paint.setStrokeWidth(2);
-			canvas.drawCircle(centerX, centerY, radius * innerRate, paint);
-			break;
-		case MODE_ERROR:
-			paint.setStyle(Paint.Style.STROKE);
-			paint.setColor(COLOR_ERROR);
-			paint.setStrokeWidth(radius * outerWidthRate);
-			canvas.drawCircle(centerX, centerY, radius * outerRate, paint);
-			paint.setStrokeWidth(2);
-			canvas.drawCircle(centerX, centerY, radius * innerRate, paint);
-			break;
-		}
-		
-		if((mode & 0xFF) > 0){
-			paint.setStyle(Paint.Style.FILL);
-			//paint.setColor(COLOR_ERROR);
-			
+			paint.setColor(0xFFFF0000);
+
 			canvas.save();
-			//canvas.translate(-centerX, -arrowDistance);
-			switch(mode & 0xFF){
-			case ARROW_TOP:
-				break;
-			case ARROW_TOP_RIGHT:
-				canvas.rotate(45, centerX, centerY);
-				break;
-			case ARROW_RIGHT:
-				canvas.rotate(90, centerX, centerY);
-				break;
-			case ARROW_RIGHT_BOTTOM:
-				canvas.rotate(135, centerX, centerY);
-				break;
-			case ARROW_BOTTOM:
-				canvas.rotate(180, centerX, centerY);
-				break;
-			case ARROW_BOTTOM_LEFT:
-				canvas.rotate(-135, centerX, centerY);
-				break;
-			case ARROW_LEFT:
-				canvas.rotate(-90, centerX, centerY);
-				break;
-			case ARROW_LEFT_TOP:
-				canvas.rotate(-45, centerX, centerY);
-				break;
-			}
-			
+			canvas.rotate(errorArrow, centerX, centerY);
 			canvas.drawPath(arrow, paint);
-			
+
 			canvas.restore();
 		}
 		

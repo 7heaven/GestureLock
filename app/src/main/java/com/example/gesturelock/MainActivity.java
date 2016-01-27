@@ -1,6 +1,7 @@
 package com.example.gesturelock;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -9,6 +10,8 @@ import android.widget.Toast;
 
 import com.example.gesturelock.widget.GestureLock;
 import com.example.gesturelock.widget.GestureLock.OnGestureEventListener;
+import com.example.gesturelock.widget.GestureLockView;
+import com.example.gesturelock.widget.NexusStyleLockView;
 
 public class MainActivity extends Activity {
 
@@ -20,7 +23,28 @@ public class MainActivity extends Activity {
 		setContentView(R.layout.activity_main);
 		
 		gestureView = (GestureLock) findViewById(R.id.gesture_lock);
-		gestureView.setCorrectGesture(new int[]{0, 3, 6, 7, 8, 5, 2, 1, 4});
+		gestureView.setAdapter(new GestureLock.GestureLockAdapter() {
+			@Override
+			public int getDepth() {
+				return 5;
+			}
+
+			@Override
+			public int[] getDefaultGestures() {
+				return new int[]{0, 3, 6, 7, 8, 5, 2, 1, 4};
+			}
+
+			@Override
+			public int getUnmatchedBoundary() {
+				return 5;
+			}
+
+			@Override
+			public GestureLockView getGestureLockViewInstance(Context context) {
+				return new NexusStyleLockView(context);
+			}
+		});
+//		gestureView.setCorrectGesture(new int[]{0, 3, 6, 7, 8, 5, 2, 1, 4});
 		//gestureView.setMode(GestureLock.MODE_EDIT);
 		//gestureView.setMode(GestureLockView.MODE_ERROR | GestureLockView.ARROW_BOTTOM_LEFT);
 		gestureView.setOnGestureEventListener(new OnGestureEventListener(){
