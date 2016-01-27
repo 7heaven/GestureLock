@@ -15,6 +15,7 @@ public class GestureLock extends RelativeLayout{
 	
 	public static final int MODE_NORMAL = 0;
 	public static final int MODE_EDIT = 1;
+	private static final int COLOR_PATH = 0x66FF0000;
 	
 	private int mode = MODE_NORMAL;
 	
@@ -144,7 +145,7 @@ public class GestureLock extends RelativeLayout{
 				lastPathX = lastX;
 				lastPathY = lastY;
 				
-				paint.setColor(0x66FFFFFF);
+				paint.setColor(COLOR_PATH);
 				
 				break;
 			case MotionEvent.ACTION_MOVE:
@@ -192,18 +193,28 @@ public class GestureLock extends RelativeLayout{
 				
 				if(gesturesContainer[0] != -1){
 					boolean matched = false;
-					for(int j = 0; j < defaultGestures.length; j++){
-						if(gesturesContainer[j] == defaultGestures[j]){
-							matched = true;
-						}else{
-							matched = false;
-							break;
+                                        int effectSize = 0;
+					for (int p : gesturesContainer) {
+						if(p!=-1){
+							effectSize++;
+						}
+					}
+					if(effectSize!=defaultGestures.length){
+						matched = false;
+					}else{
+						for(int j = 0; j < defaultGestures.length; j++){
+							if(gesturesContainer[j] == defaultGestures[j]){
+								matched = true;
+							}else{
+								matched = false;
+								break;
+							}
 						}
 					}
 					
 					if(!matched && mode != MODE_EDIT){
 						unmatchedCount++;
-						paint.setColor(0x66FF0000);
+						paint.setColor(COLOR_PATH);
 						for(int k : gesturesContainer){
 							View selectedChild = findViewById(k + 1);
 							if(selectedChild != null && selectedChild instanceof GestureLockView){
@@ -284,5 +295,23 @@ public class GestureLock extends RelativeLayout{
 		}
 		
 		if(gesturesContainer[0] != -1) canvas.drawLine(lastPathX, lastPathY, lastX, lastY, paint);
+	}
+	
+	/**
+	 * clear Gesture
+	 */
+	public void clearGestureLock(){
+		
+		unmatchedCount = 0;
+		touchable = true;
+		
+		for(int k : gesturesContainer){
+			View selectedChild = findViewById(k + 1);
+			if(selectedChild != null && selectedChild instanceof GestureLockView){
+				((GestureLockView) selectedChild).setMode(GestureLockView.MODE_NORMAL);
+			}
+		}
+		gesturePath = null;
+		invalidate();
 	}
 }
