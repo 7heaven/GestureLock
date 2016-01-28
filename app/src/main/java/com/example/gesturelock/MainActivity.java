@@ -2,8 +2,9 @@ package com.example.gesturelock;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.Toast;
@@ -44,9 +45,7 @@ public class MainActivity extends Activity {
 				return new NexusStyleLockView(context);
 			}
 		});
-//		gestureView.setCorrectGesture(new int[]{0, 3, 6, 7, 8, 5, 2, 1, 4});
-		//gestureView.setMode(GestureLock.MODE_EDIT);
-		//gestureView.setMode(GestureLockView.MODE_ERROR | GestureLockView.ARROW_BOTTOM_LEFT);
+
 		gestureView.setOnGestureEventListener(new OnGestureEventListener(){
 
 			@Override
@@ -57,15 +56,6 @@ public class MainActivity extends Activity {
 			@Override
 			public void onUnmatchedExceedBoundary() {
 				Toast.makeText(MainActivity.this, "输入5次错误!30秒后才能输入", Toast.LENGTH_SHORT).show();
-				/*
-				gestureView.setTouchable(false);
-				new Handler().postDelayed(new Runnable(){
-					@Override
-					public void run(){
-						gestureView.setTouchable(true);
-					}
-				}, 30000);
-				 */
 			}
 
 			@Override

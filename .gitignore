@@ -8,6 +8,5 @@
 build/
 app/build/
 *.iml
-tifen.keystore
 app/app.iml
 local.properties

@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -50,16 +49,16 @@ public class GestureLock extends RelativeLayout{
 	private GestureLockAdapter mAdapter;
 	
 	public interface OnGestureEventListener{
-		public void onBlockSelected(int position);
-		public void onGestureEvent(boolean matched);
-		public void onUnmatchedExceedBoundary();
+		void onBlockSelected(int position);
+		void onGestureEvent(boolean matched);
+		void onUnmatchedExceedBoundary();
 	}
 
 	public interface GestureLockAdapter{
-		public int getDepth();
-		public int[] getCorrectGestures();
-		public int getUnmatchedBoundary();
-		public GestureLockView getGestureLockViewInstance(Context context);
+		int getDepth();
+		int[] getCorrectGestures();
+		int getUnmatchedBoundary();
+		GestureLockView getGestureLockViewInstance(Context context);
 	}
 
 	public GestureLock(Context context){
@@ -109,7 +108,7 @@ public class GestureLock extends RelativeLayout{
 		this.touchable = touchable;
 	}
 	
-	public void rewindUnmatchedCount(){
+	public void resetUnmatchedCount(){
 		unmatchedCount = 0;
 	}
 	
@@ -158,17 +157,6 @@ public class GestureLock extends RelativeLayout{
 		}
 	}
 
-	public void setDepth(int depth){
-		this.depth = depth;
-
-		negativeGestures = new int[depth * depth];
-		for(int i = 0; i < negativeGestures.length; i++) negativeGestures[i] = -1;
-		gesturesContainer = negativeGestures.clone();
-
-		clear();
-		requestLayout();
-	}
-
 	public void clear(){
 		for(int i = 0; i < getChildCount(); i++) {
 			View c = getChildAt(i);
@@ -183,134 +171,130 @@ public class GestureLock extends RelativeLayout{
 	}
 	
 	@Override
-	public boolean onTouchEvent(MotionEvent event){
-		if(touchable){
-			switch(event.getActionMasked()){
-			case MotionEvent.ACTION_DOWN:
-				for(int i = 0; i < getChildCount(); i++) {
-					View c = getChildAt(i);
-					if (c instanceof GestureLockView){
-						((GestureLockView) c).setLockerState(GestureLockView.LockerState.LOCKER_STATE_NORMAL);
-						((GestureLockView) c).setArrow(-1);
-					}
-				}
-				
-				gesturePath = null;
-				
-				lastX = (int) event.getX();
-				lastY = (int) event.getY();
-				lastPathX = lastX;
-				lastPathY = lastY;
-				
-				paint.setColor(0x66FFFFFF);
-				
-				break;
-			case MotionEvent.ACTION_MOVE:
-				
-				lastX = (int) event.getX();
-				lastY = (int) event.getY();
-				
-				int cId = calculateChildIdByCoords(lastX, lastY);
-				
-				View child = findViewById(cId + 1);
-				boolean checked = false;
-				for(int id : gesturesContainer){
-					if(id == cId){
-						checked = true;
-						break;
-					}
-				}
-				
-				if(child != null && child instanceof GestureLockView && checkChildInCoords(lastX, lastY, child)){
-					((GestureLockView) child).setLockerState(GestureLockView.LockerState.LOCKER_STATE_SELECTED);
-					
-					if(!checked){
-						int checkedX = child.getLeft() + child.getWidth() / 2;
-						int checkedY = child.getTop() + child.getHeight() / 2;
-						if(gesturePath == null){
-							gesturePath = new Path();
-							gesturePath.moveTo(checkedX, checkedY);
-						}else{
-							gesturePath.lineTo(checkedX, checkedY);
+	public boolean onTouchEvent(MotionEvent event) {
+		if (touchable) {
+			switch (event.getActionMasked()) {
+				case MotionEvent.ACTION_DOWN:
+					for (int i = 0; i < getChildCount(); i++) {
+						View c = getChildAt(i);
+						if (c instanceof GestureLockView) {
+							((GestureLockView) c).setLockerState(GestureLockView.LockerState.LOCKER_STATE_NORMAL);
+							((GestureLockView) c).setArrow(-1);
 						}
-						gesturesContainer[gestureCursor] = cId;
-						gestureCursor++;
-						
-						lastPathX = checkedX;
-						lastPathY = checkedY;
-						
-						if(onGestureEventListener != null) onGestureEventListener.onBlockSelected(cId);
 					}
-				}
-				
-				invalidate();
-				break;
-			case MotionEvent.ACTION_CANCEL:
-			case MotionEvent.ACTION_UP:
-				
-				if(gesturesContainer[0] != -1){
-					boolean matched = false;
-					for(int j = 0; j < defaultGestures.length; j++){
-						if(gesturesContainer[j] == defaultGestures[j]){
-							matched = true;
-						}else{
-							matched = false;
+
+					gesturePath = null;
+
+					lastX = (int) event.getX();
+					lastY = (int) event.getY();
+					lastPathX = lastX;
+					lastPathY = lastY;
+
+					paint.setColor(0x66FFFFFF);
+
+					break;
+				case MotionEvent.ACTION_MOVE:
+
+					lastX = (int) event.getX();
+					lastY = (int) event.getY();
+
+					int cId = calculateChildIdByCoords(lastX, lastY);
+
+					View child = findViewById(cId + 1);
+					boolean checked = false;
+					for (int id : gesturesContainer) {
+						if (id == cId) {
+							checked = true;
 							break;
 						}
 					}
-					
-					if(!matched && mode != MODE_EDIT){
-						unmatchedCount++;
-						paint.setColor(0x66FF0000);
-						for(int k = 0; k < gesturesContainer.length; k++){
-							View selectedChild = findViewById(gesturesContainer[k] + 1);
-							if(selectedChild != null && selectedChild instanceof GestureLockView){
-								((GestureLockView) selectedChild).setLockerState(GestureLockView.LockerState.LOCKER_STATE_ERROR);
 
-								if(k < gesturesContainer.length - 1 && gesturesContainer[k + 1] != -1){
-									View nextChild = findViewById(gesturesContainer[k + 1] + 1);
-									if(nextChild != null){
-										int dx = nextChild.getLeft() - selectedChild.getLeft();
-										int dy = nextChild.getTop() - selectedChild.getTop();
+					if (child != null && child instanceof GestureLockView && checkChildInCoords(lastX, lastY, child)) {
+						((GestureLockView) child).setLockerState(GestureLockView.LockerState.LOCKER_STATE_SELECTED);
 
-										int angle = (int) Math.toDegrees(Math.atan2(dy, dx)) + 90;
-										((GestureLockView) selectedChild).setArrow(angle);
+						if (!checked) {
+							int checkedX = child.getLeft() + child.getWidth() / 2;
+							int checkedY = child.getTop() + child.getHeight() / 2;
+							if (gesturePath == null) {
+								gesturePath = new Path();
+								gesturePath.moveTo(checkedX, checkedY);
+							} else {
+								gesturePath.lineTo(checkedX, checkedY);
+							}
+							gesturesContainer[gestureCursor] = cId;
+							gestureCursor++;
+
+							lastPathX = checkedX;
+							lastPathY = checkedY;
+
+							if (onGestureEventListener != null)
+								onGestureEventListener.onBlockSelected(cId);
+						}
+					}
+
+					invalidate();
+					break;
+				case MotionEvent.ACTION_CANCEL:
+				case MotionEvent.ACTION_UP:
+
+					if (gesturesContainer[0] != -1) {
+						boolean matched = false;
+						for (int j = 0; j < defaultGestures.length; j++) {
+							if (gesturesContainer[j] == defaultGestures[j]) {
+								matched = true;
+							} else {
+								matched = false;
+								break;
+							}
+						}
+
+						if (!matched && mode != MODE_EDIT) {
+							unmatchedCount++;
+							paint.setColor(0x66FF0000);
+							for (int k = 0; k < gesturesContainer.length; k++) {
+								View selectedChild = findViewById(gesturesContainer[k] + 1);
+								if (selectedChild != null && selectedChild instanceof GestureLockView) {
+									((GestureLockView) selectedChild).setLockerState(GestureLockView.LockerState.LOCKER_STATE_ERROR);
+
+									if (k < gesturesContainer.length - 1 && gesturesContainer[k + 1] != -1) {
+										View nextChild = findViewById(gesturesContainer[k + 1] + 1);
+										if (nextChild != null) {
+											int dx = nextChild.getLeft() - selectedChild.getLeft();
+											int dy = nextChild.getTop() - selectedChild.getTop();
+
+											int angle = (int) Math.toDegrees(Math.atan2(dy, dx)) + 90;
+											((GestureLockView) selectedChild).setArrow(angle);
+										}
 									}
 								}
 							}
-						}
-					}else{
-						unmatchedCount = 0;
-					}
-					
-					
-					
-					if(onGestureEventListener != null){
-						onGestureEventListener.onGestureEvent(matched);
-						if(unmatchedCount >= unmatchedBoundary){
-							onGestureEventListener.onUnmatchedExceedBoundary();
+						} else {
 							unmatchedCount = 0;
 						}
+
+
+						if (onGestureEventListener != null) {
+							onGestureEventListener.onGestureEvent(matched);
+							if (unmatchedCount >= unmatchedBoundary) {
+								onGestureEventListener.onUnmatchedExceedBoundary();
+								unmatchedCount = 0;
+							}
+						}
 					}
-				}
-				
-				gestureCursor = 0;
-				gesturesContainer = negativeGestures.clone();
-				
-				lastX = lastPathX;
-				lastY = lastPathY;
-				
-				invalidate();
-				
-				break;
+
+					gestureCursor = 0;
+					gesturesContainer = negativeGestures.clone();
+
+					lastX = lastPathX;
+					lastY = lastPathY;
+
+					invalidate();
+
+					break;
 			}
 		}
-		
+
 		return true;
-	}
-	
-	public void setCorrectGesture(int[] correctGestures){
-		defaultGestures = correctGestures;
 	}
 	
 	public void setMode(int mode){
