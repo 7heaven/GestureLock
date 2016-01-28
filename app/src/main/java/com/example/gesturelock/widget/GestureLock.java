@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -261,8 +262,8 @@ public class GestureLock extends RelativeLayout{
 					if(!matched && mode != MODE_EDIT){
 						unmatchedCount++;
 						paint.setColor(0x66FF0000);
-						for(int k : gesturesContainer){
-							View selectedChild = findViewById(k + 1);
+						for(int k = 0; k < gesturesContainer.length; k++){
+							View selectedChild = findViewById(gesturesContainer[k] + 1);
 							if(selectedChild != null && selectedChild instanceof GestureLockView){
 								((GestureLockView) selectedChild).setLockerState(GestureLockView.LockerState.LOCKER_STATE_ERROR);
 
@@ -345,12 +346,13 @@ public class GestureLock extends RelativeLayout{
 	
 	@Override
 	public void dispatchDraw(Canvas canvas){
-		super.dispatchDraw(canvas);
 		
 		if(gesturePath != null){
 			 canvas.drawPath(gesturePath, paint);
 		}
 		
 		if(gesturesContainer[0] != -1) canvas.drawLine(lastPathX, lastPathY, lastX, lastY, paint);
+
+		super.dispatchDraw(canvas);
 	}
 }

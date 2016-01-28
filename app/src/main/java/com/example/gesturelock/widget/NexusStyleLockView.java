@@ -3,6 +3,7 @@ package com.example.gesturelock.widget;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.util.AttributeSet;
 
 /**
@@ -23,6 +24,12 @@ public class NexusStyleLockView extends GestureLockView {
     private float outerWidthRate = 0.15F;
     private float outerRate = 0.91F;
 
+    private float arrowRate = 0.3F;
+    private float arrowDistanceRate = 0.65F;
+    private int arrowDistance;
+
+    private Path arrow;
+
     public NexusStyleLockView(Context context){
         this(context, null);
     }
@@ -33,6 +40,8 @@ public class NexusStyleLockView extends GestureLockView {
 
     public NexusStyleLockView(Context context, AttributeSet attrs, int defStyle){
         super(context, attrs, defStyle);
+
+        arrow = new Path();
     }
 
     @Override
@@ -47,8 +56,25 @@ public class NexusStyleLockView extends GestureLockView {
 
         mRadius = w > h ? h : w;
         mRadius /= 2;
+
+        arrowDistance = (int) (mRadius * arrowDistanceRate);
+
+        int length = (int) (mRadius * arrowRate);
+        arrow.reset();
+        arrow.moveTo(mCenterX - length, mCenterY + length - arrowDistance);
+        arrow.lineTo(mCenterX, mCenterY - arrowDistance);
+        arrow.lineTo(mCenterX + length, mCenterY + length - arrowDistance);
+        arrow.close();
     }
 
+    @Override
+    protected void doArrowDraw(Canvas canvas){
+        mPaint.setStyle(Paint.Style.FILL);
+        mPaint.setColor(COLOR_ERROR);
+        canvas.drawPath(arrow, mPaint);
+    }
+
+    @Override
     protected void doDraw(LockerState state, Canvas canvas){
         switch(state){
             case LOCKER_STATE_NORMAL:
