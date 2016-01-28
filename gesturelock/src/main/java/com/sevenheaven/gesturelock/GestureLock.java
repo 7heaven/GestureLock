@@ -61,7 +61,7 @@ public class GestureLock extends RelativeLayout {
         int getDepth();
         int[] getCorrectGestures();
         int getUnmatchedBoundary();
-        GestureLockView getGestureLockViewInstance(Context context);
+        GestureLockView getGestureLockViewInstance(Context context, int position);
     }
 
     public GestureLock(Context context){
@@ -139,7 +139,7 @@ public class GestureLock extends RelativeLayout {
                 gestureWidth = blockWidth * depth + blockGap * (depth - 1);
                 lockers = new GestureLockView[depth * depth];
                 for(int i = 0; i < lockers.length; i++){
-                    lockers[i] = mAdapter.getGestureLockViewInstance(getContext());
+                    lockers[i] = mAdapter.getGestureLockViewInstance(getContext(), i);
                     lockers[i].setId(i + 1);
 
                     RelativeLayout.LayoutParams lockerParams = new RelativeLayout.LayoutParams(blockWidth, blockWidth);

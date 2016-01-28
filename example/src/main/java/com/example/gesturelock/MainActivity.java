@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.widget.Toast;
 
+import com.example.gesturelock.widget.MyStyleLockView;
 import com.example.gesturelock.widget.NexusStyleLockView;
 import com.sevenheaven.gesturelock.GestureLock;
 import com.sevenheaven.gesturelock.GestureLockView;
@@ -38,8 +39,12 @@ public class MainActivity extends Activity {
 			}
 
 			@Override
-			public GestureLockView getGestureLockViewInstance(Context context) {
-				return new NexusStyleLockView(context);
+			public GestureLockView getGestureLockViewInstance(Context context, int position) {
+				if(position % 2 == 0){
+					return new MyStyleLockView(context);
+				}else{
+					return new NexusStyleLockView(context);
+				}
 			}
 		});
 
