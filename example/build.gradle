@@ -1,14 +1,15 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 19
+    compileSdkVersion 22
     buildToolsVersion "23.0.0"
 
     defaultConfig {
         applicationId "com.example.gesturelock"
         minSdkVersion 8
-        targetSdkVersion 18
+        targetSdkVersion 22
     }
+
 
     buildTypes {
         release {
@@ -19,5 +20,6 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:support-v4:19.1.0'
+    compile 'com.android.support:support-v4:22.1.0'
+    compile project(':gesturelock')
 }

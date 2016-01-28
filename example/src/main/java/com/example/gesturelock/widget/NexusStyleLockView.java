@@ -6,6 +6,8 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
 
+import com.sevenheaven.gesturelock.GestureLockView;
+
 /**
  * Created by caifangmao on 1/27/16.
  */

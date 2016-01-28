@@ -2,17 +2,14 @@ package com.example.gesturelock;
 
 import android.app.Activity;
 import android.content.Context;
-import android.graphics.Paint;
-import android.graphics.Path;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.widget.Toast;
 
-import com.example.gesturelock.widget.GestureLock;
-import com.example.gesturelock.widget.GestureLock.OnGestureEventListener;
-import com.example.gesturelock.widget.GestureLockView;
 import com.example.gesturelock.widget.NexusStyleLockView;
+import com.sevenheaven.gesturelock.GestureLock;
+import com.sevenheaven.gesturelock.GestureLockView;
 
 public class MainActivity extends Activity {
 
@@ -46,7 +43,7 @@ public class MainActivity extends Activity {
 			}
 		});
 
-		gestureView.setOnGestureEventListener(new OnGestureEventListener(){
+		gestureView.setOnGestureEventListener(new GestureLock.OnGestureEventListener(){
 
 			@Override
 			public void onGestureEvent(boolean matched) {
@@ -68,7 +65,6 @@ public class MainActivity extends Activity {
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
 		return true;
 	}
