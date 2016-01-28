@@ -30,7 +30,7 @@ public class MainActivity extends Activity {
 			}
 
 			@Override
-			public int[] getDefaultGestures() {
+			public int[] getCorrectGestures() {
 				return new int[]{0, 3, 6, 7, 8, 5, 2, 1, 4};
 			}
 

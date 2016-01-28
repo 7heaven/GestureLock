@@ -56,7 +56,7 @@ public class GestureLock extends RelativeLayout{
 
 	public interface GestureLockAdapter{
 		public int getDepth();
-		public int[] getDefaultGestures();
+		public int[] getCorrectGestures();
 		public int getUnmatchedBoundary();
 		public GestureLockView getGestureLockViewInstance(Context context);
 	}
@@ -96,7 +96,7 @@ public class GestureLock extends RelativeLayout{
 			for(int i = 0; i < negativeGestures.length; i++) negativeGestures[i] = -1;
 			gesturesContainer = negativeGestures.clone();
 
-			defaultGestures = mAdapter.getDefaultGestures();
+			defaultGestures = mAdapter.getCorrectGestures();
 
 			unmatchedBoundary = mAdapter.getUnmatchedBoundary();
 
