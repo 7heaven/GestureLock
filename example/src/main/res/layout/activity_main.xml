@@ -9,7 +9,7 @@
     tools:context=".MainActivity"
     android:background="#555555" >
 
-    <com.example.gesturelock.widget.GestureLock
+    <com.sevenheaven.gesturelock.GestureLock
         android:id="@+id/gesture_lock"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
