@@ -207,32 +207,6 @@ public class GestureLock extends ViewGroup {
 
                     child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
                 }
-
-//                for(int i = 0; i < getChildCount(); i++){
-//                    removeViewAt(i);
-//                }
-//
-//                blockWidth = (length - (blockGap * (depth - 1))) / depth;
-//                gestureWidth = blockWidth * depth + blockGap * (depth - 1);
-//                lockers = new GestureLockView[depth * depth];
-//                for(int i = 0; i < lockers.length; i++){
-//                    lockers[i] = mAdapter.getGestureLockViewInstance(getContext(), i);
-//                    lockers[i].setId(i + 1);
-//
-//                    RelativeLayout.LayoutParams lockerParams = new RelativeLayout.LayoutParams(blockWidth, blockWidth);
-//                    if(i % depth != 0) lockerParams.addRule(RelativeLayout.RIGHT_OF, lockers[i - 1].getId());
-//                    if(i > (depth - 1)) lockerParams.addRule(RelativeLayout.BELOW, lockers[i - depth].getId());
-//                    int rightMargin = 0;
-//                    int bottomMargin = 0;
-//                    if((i + 1) % depth != 0) rightMargin = blockGap;
-//                    if(i < depth * (depth - 1)) bottomMargin = blockGap;
-//
-//                    lockerParams.setMargins(0, 0, rightMargin, bottomMargin);
-//
-//                    addView(lockers[i], lockerParams);
-//
-//                    lockers[i].setLockerState(GestureLockView.LockerState.LOCKER_STATE_NORMAL);
-//                }
             }
         }
     }
