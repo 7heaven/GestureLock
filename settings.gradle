@@ -1,5 +1,1 @@
-<<<<<<< HEAD
-include ':app'
-=======
 include ':example', ':gesturelock'
->>>>>>> c6bf701cc2d329cc36c8e7fd07f6151111ff1b86
