@@ -2,6 +2,7 @@ package com.sevenheaven.gesturelock;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -10,8 +11,12 @@ import android.view.View;
  */
 public abstract class GestureLockView extends View {
 
+    private static final boolean DEBUG = false;
+
     private int mWidth, mHeight;
     private int mCenterX, mCenterY;
+
+    private Paint mPaint;
 
     public enum LockerState{
         LOCKER_STATE_NORMAL, LOCKER_STATE_ERROR, LOCKER_STATE_SELECTED
@@ -78,6 +83,15 @@ public abstract class GestureLockView extends View {
 
     @Override
     public void onDraw(Canvas canvas){
+
+        if(DEBUG){
+            if(mPaint == null){
+                mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            }
+            mPaint.setColor(0xFFFF0000);
+            mPaint.setTextSize(20);
+            canvas.drawText(getId() + "", 0, getHeight(), mPaint);
+        }
 
         doDraw(mState, canvas);
 

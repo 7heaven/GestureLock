@@ -5,13 +5,12 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.RelativeLayout;
+import android.view.ViewGroup;
 
-public class GestureLock extends RelativeLayout {
-
-    private GestureLockView[] lockers;
+public class GestureLock extends ViewGroup {
 
     public static final int MODE_NORMAL = 0;
     public static final int MODE_EDIT = 1;
@@ -19,6 +18,9 @@ public class GestureLock extends RelativeLayout {
     private int mode = MODE_NORMAL;
 
     private int depth = 3;
+
+    private int mWidth, mHeight;
+    private int mCenterX, mCenterY;
 
     private int[] defaultGestures = new int[]{0};
     private int[] negativeGestures;
@@ -33,10 +35,10 @@ public class GestureLock extends RelativeLayout {
     private int lastPathX;
     private int lastPathY;
 
-    private int blockWidth = 190;
-    private int blockGap = 70;
+    private static final int MAX_BLOCK_SIZE = 200;
 
-    private int gestureWidth;
+    private int mContentSize;
+    private int mHalfContentSize;
 
     private Paint paint;
 
@@ -55,12 +57,13 @@ public class GestureLock extends RelativeLayout {
     }
 
     /**
-     * GestureLockAdapter provide a way to
+     * GestureLockAdapter provide a way to customize the depth, correct gestures and gesture locker style
      */
     public interface GestureLockAdapter{
         int getDepth();
         int[] getCorrectGestures();
         int getUnmatchedBoundary();
+        int getBlockGapSize();
         GestureLockView getGestureLockViewInstance(Context context, int position);
     }
 
@@ -91,20 +94,44 @@ public class GestureLock extends RelativeLayout {
     }
 
     public void setAdapter(GestureLockAdapter adapter){
+        if(mAdapter == adapter) return;
+
         mAdapter = adapter;
 
         if(mAdapter != null){
-            this.depth = mAdapter.getDepth();
-            negativeGestures = new int[depth * depth];
-            for(int i = 0; i < negativeGestures.length; i++) negativeGestures[i] = -1;
-            gesturesContainer = negativeGestures.clone();
-
-            defaultGestures = mAdapter.getCorrectGestures();
-
-            unmatchedBoundary = mAdapter.getUnmatchedBoundary();
-
-            requestLayout();
+            updateParametersForAdapter();
+            updateChildForAdapter();
         }
+    }
+
+    private void updateChildForAdapter(){
+        final int totalBlockCount = depth * depth;
+        removeAllViewsInLayout();
+
+        for(int i = 0; i < totalBlockCount; i++){
+            GestureLockView child = mAdapter.getGestureLockViewInstance(getContext(), i);
+            child.setLockerState(GestureLockView.LockerState.LOCKER_STATE_NORMAL);
+            child.setId(i + 1);
+
+            addViewInLayout(child, i, generateDefaultLayoutParams());
+        }
+
+        requestLayout();
+    }
+
+    private void updateParametersForAdapter(){
+        this.depth = mAdapter.getDepth();
+
+        negativeGestures = new int[depth * depth];
+        for(int i = 0; i < negativeGestures.length; i++) negativeGestures[i] = -1;
+        gesturesContainer = negativeGestures.clone();
+        defaultGestures = mAdapter.getCorrectGestures();
+        unmatchedBoundary = mAdapter.getUnmatchedBoundary();
+    }
+
+    public void notifyDataChanged(){
+        updateParametersForAdapter();
+        updateChildForAdapter();
     }
 
     public void setTouchable(boolean touchable){
@@ -120,42 +147,139 @@ public class GestureLock extends RelativeLayout {
     }
 
     @Override
+    public void addView(View child, int width, int height){
+        if(!(child instanceof GestureLockView)){
+            throw new IllegalArgumentException();
+        }
+
+        super.addView(child, width, height);
+    }
+
+    @Override
+    public void addView(View child, int index, ViewGroup.LayoutParams layoutParams){
+        if(!(child instanceof GestureLockView)){
+            throw new IllegalArgumentException();
+        }
+
+        super.addView(child, index, layoutParams);
+    }
+
+    @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec){
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 
-        int width = MeasureSpec.getSize(widthMeasureSpec);
-        int height = MeasureSpec.getSize(heightMeasureSpec);
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
 
-        int length = width > height ? height : width;
+        int widthSize = MeasureSpec.getSize(widthMeasureSpec);
+        int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
         if(mAdapter != null){
-            if((lockers != null && lockers.length != depth * depth) || lockers == null){
+            final int childCount = getChildCount();
+            if(childCount == depth * depth){
 
-                for(int i = 0; i < getChildCount(); i++){
-                    removeViewAt(i);
+                int childWidthMode, childHeightMode;
+                int childWidthSize, childHeightSize;
+
+                int totalGap = mAdapter.getBlockGapSize() * (depth - 1);
+
+                if(widthMode == MeasureSpec.EXACTLY){
+                    childWidthMode = MeasureSpec.EXACTLY;
+                    childWidthSize = (widthSize - totalGap) / depth;
+                }else{
+                    childWidthMode = MeasureSpec.AT_MOST;
+                    childWidthSize = MAX_BLOCK_SIZE;
                 }
 
-                blockWidth = (length - (blockGap * (depth - 1))) / depth;
-                gestureWidth = blockWidth * depth + blockGap * (depth - 1);
-                lockers = new GestureLockView[depth * depth];
-                for(int i = 0; i < lockers.length; i++){
-                    lockers[i] = mAdapter.getGestureLockViewInstance(getContext(), i);
-                    lockers[i].setId(i + 1);
-
-                    RelativeLayout.LayoutParams lockerParams = new RelativeLayout.LayoutParams(blockWidth, blockWidth);
-                    if(i % depth != 0) lockerParams.addRule(RelativeLayout.RIGHT_OF, lockers[i - 1].getId());
-                    if(i > (depth - 1)) lockerParams.addRule(RelativeLayout.BELOW, lockers[i - depth].getId());
-                    int rightMargin = 0;
-                    int bottomMargin = 0;
-                    if((i + 1) % depth != 0) rightMargin = blockGap;
-                    if(i < depth * (depth - 1)) bottomMargin = blockGap;
-
-                    lockerParams.setMargins(0, 0, rightMargin, bottomMargin);
-
-                    addView(lockers[i], lockerParams);
-
-                    lockers[i].setLockerState(GestureLockView.LockerState.LOCKER_STATE_NORMAL);
+                if(heightMode == MeasureSpec.EXACTLY){
+                    childHeightMode = MeasureSpec.EXACTLY;
+                    childHeightSize = (heightSize - totalGap) / depth;
+                }else{
+                    childHeightMode = MeasureSpec.AT_MOST;
+                    childHeightSize = MAX_BLOCK_SIZE;
                 }
+
+                int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(childWidthSize, childWidthMode);
+                int childHeightMeasureSpec = MeasureSpec.makeMeasureSpec(childHeightSize, childHeightMode);
+
+                for(int i = 0; i < childCount; i++){
+                    View child = getChildAt(i);
+
+                    child.measure(childWidthMeasureSpec, childHeightMeasureSpec);
+                }
+
+//                for(int i = 0; i < getChildCount(); i++){
+//                    removeViewAt(i);
+//                }
+//
+//                blockWidth = (length - (blockGap * (depth - 1))) / depth;
+//                gestureWidth = blockWidth * depth + blockGap * (depth - 1);
+//                lockers = new GestureLockView[depth * depth];
+//                for(int i = 0; i < lockers.length; i++){
+//                    lockers[i] = mAdapter.getGestureLockViewInstance(getContext(), i);
+//                    lockers[i].setId(i + 1);
+//
+//                    RelativeLayout.LayoutParams lockerParams = new RelativeLayout.LayoutParams(blockWidth, blockWidth);
+//                    if(i % depth != 0) lockerParams.addRule(RelativeLayout.RIGHT_OF, lockers[i - 1].getId());
+//                    if(i > (depth - 1)) lockerParams.addRule(RelativeLayout.BELOW, lockers[i - depth].getId());
+//                    int rightMargin = 0;
+//                    int bottomMargin = 0;
+//                    if((i + 1) % depth != 0) rightMargin = blockGap;
+//                    if(i < depth * (depth - 1)) bottomMargin = blockGap;
+//
+//                    lockerParams.setMargins(0, 0, rightMargin, bottomMargin);
+//
+//                    addView(lockers[i], lockerParams);
+//
+//                    lockers[i].setLockerState(GestureLockView.LockerState.LOCKER_STATE_NORMAL);
+//                }
+            }
+        }
+    }
+
+    @Override
+    protected ViewGroup.LayoutParams generateDefaultLayoutParams() {
+        return new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+    }
+
+    @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh){
+        mWidth = w;
+        mHeight = h;
+
+        mCenterX = w / 2;
+        mCenterY = h / 2;
+
+        mContentSize = mWidth > mHeight ? mHeight : mWidth;
+        mHalfContentSize = mContentSize / 2;
+    }
+
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b){
+
+        int totalGap = mAdapter.getBlockGapSize() * (depth - 1);
+
+        final int xStart = mCenterX - mHalfContentSize;
+        final int yStart = mCenterY - mHalfContentSize;
+
+        int xStep = xStart;
+        int yStep = yStart;
+
+        int childSize = (mContentSize - totalGap) / depth;
+
+        final int childCount = getChildCount();
+
+        for(int i = 0; i < childCount; i++){
+
+            View child = getChildAt(i);
+
+            child.layout(xStep, yStep, xStep + childSize, yStep + childSize);
+
+            if(i % depth == depth - 1){
+                xStep = xStart;
+                yStep += childSize + mAdapter.getBlockGapSize();
+            }else{
+                xStep += childSize + mAdapter.getBlockGapSize();
             }
         }
     }
@@ -175,6 +299,7 @@ public class GestureLock extends RelativeLayout {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
         if (touchable) {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
@@ -305,9 +430,12 @@ public class GestureLock extends RelativeLayout {
     }
 
     private int calculateChildIdByCoords(int x, int y){
-        if(x >= 0 && x <= gestureWidth && y >= 0 && y <= gestureWidth){
-            int rowX = (int) (((float) x / (float) gestureWidth) * depth);
-            int rowY = (int) (((float) y / (float) gestureWidth) * depth);
+        if(x >= mCenterX - mHalfContentSize && x <= mCenterX + mHalfContentSize && y >= mCenterY - mHalfContentSize && y <= mCenterY + mHalfContentSize){
+            x -= mCenterX - mHalfContentSize;
+            y -= mCenterY - mHalfContentSize;
+
+            int rowX = (int) (((float) x / (float) mContentSize) * depth);
+            int rowY = (int) (((float) y / (float) mContentSize) * depth);
 
             return rowX + (rowY * depth);
         }
@@ -317,6 +445,7 @@ public class GestureLock extends RelativeLayout {
 
     private boolean checkChildInCoords(int x, int y, View child){
         if(child != null){
+
             int centerX = child.getLeft() + child.getWidth() / 2;
             int centerY = child.getTop() + child.getHeight() / 2;
 

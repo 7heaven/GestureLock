@@ -25,7 +25,7 @@ public class MainActivity extends Activity {
 		gestureView.setAdapter(new GestureLock.GestureLockAdapter() {
 			@Override
 			public int getDepth() {
-				return 5;
+				return 7;
 			}
 
 			@Override
@@ -36,6 +36,11 @@ public class MainActivity extends Activity {
 			@Override
 			public int getUnmatchedBoundary() {
 				return 5;
+			}
+
+			@Override
+			public int getBlockGapSize(){
+				return 10;
 			}
 
 			@Override
