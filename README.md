@@ -3,6 +3,9 @@
 
 ###GestureLock是一个可以自定义数量、自定义样式的手势解锁控件
 
+![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art4.png)
+![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art5.png)
+
 ##用法
 
 ####使用GestureLock类提供的Adapter来定制样式
@@ -39,9 +42,13 @@
 
 
 ```getDepth() 手势解锁的宽高数量```
+
 ```getCorrectGestures() 正确的解锁手势```
+
 ```getUnmatchedBoundary() 最大可重试次数```
+
 ```getBlockGapSize() block之前的间隔大小```
+
 ```getGestureLockViewInstance(Context context, int position) block的样式```
 
 
@@ -100,8 +107,6 @@ Block分为三种状态
 ![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art1.png)
 ![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art2.png)
 ![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art3.png)
-![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art4.png)
-![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art5.png)
 ![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art6.png)
 ![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art7.png)
 ![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art8.png)
