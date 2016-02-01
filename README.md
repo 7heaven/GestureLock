@@ -38,11 +38,11 @@
 ```
 
 
-#####getDepth() 手势解锁的宽高数量
-#####getCorrectGestures() 正确的解锁手势
-#####getUnmatchedBoundary() 最大可重试次数
-#####getBlockGapSize() block之前的间隔大小
-#####getGestureLockViewInstance(Context context, int position) block的样式
+```getDepth() 手势解锁的宽高数量```
+```getCorrectGestures() 正确的解锁手势```
+```getUnmatchedBoundary() 最大可重试次数```
+```getBlockGapSize() block之前的间隔大小```
+```getGestureLockViewInstance(Context context, int position) block的样式```
 
 
 ####继承GestureLockView来实现自定义样式的block
