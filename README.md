@@ -6,16 +6,17 @@
 ##用法
 
 ####使用GestureLock类提供的Adapter来定制样式
+```java
+    gestureView.setAdapter(new GestureLock.GestureLockAdapter() {
 
-```java gestureView.setAdapter(new GestureLock.GestureLockAdapter() {
 			@Override
 			public int getDepth() {
-				return 3;
+				return 7;
 			}
 
 			@Override
 			public int[] getCorrectGestures() {
-				return new int[]{1, 2, 3, 4};
+				return new int[]{0, 3, 6, 7, 8, 5, 2, 1, 4};
 			}
 
 			@Override
@@ -30,9 +31,15 @@
 
 			@Override
 			public GestureLockView getGestureLockViewInstance(Context context, int position) {
-				return new NexusStyleLockView(context);
+				if(position % 2 == 0){
+					return new MyStyleLockView(context);
+				}else{
+					return new NexusStyleLockView(context);
+				}
 			}
-		});```
+		});	
+
+```
   
 
 ####getDepth() 手势解锁的宽高数量
