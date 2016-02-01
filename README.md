@@ -36,13 +36,65 @@
 		});	
 
 ```
-  
 
-####getDepth() 手势解锁的宽高数量
-####getCorrectGestures() 正确的解锁手势
-####getUnmatchedBoundary() 最大可重试次数
-####getBlockGapSize() block之前的间隔大小
-####getGestureLockViewInstance(Context context, int position) block的样式
+
+#####getDepth() 手势解锁的宽高数量
+#####getCorrectGestures() 正确的解锁手势
+#####getUnmatchedBoundary() 最大可重试次数
+#####getBlockGapSize() block之前的间隔大小
+#####getGestureLockViewInstance(Context context, int position) block的样式
+
+
+####继承GestureLockView来实现自定义样式的block
+
+#####重写doArrowDraw绘制箭头(箭头角度0的时候为向上)
+
+#####重写onDraw实现Block内容样式的绘制
+
+Block分为三种状态
+
+* LockerState.LOCKER_STATE_NORMAL 正常状态
+* LockerState.LOCKER_STATE_SELECTED 选中状态
+* LockerState.LOCKER_STATE_ERROR 错误状态
+
+
+```java
+
+    @Override
+    protected void doArrowDraw(Canvas canvas){
+        mPaint.setStyle(Paint.Style.FILL);
+        mPaint.setColor(COLOR_ERROR);
+        canvas.drawPath(arrow, mPaint);
+    }
+
+    @Override
+    protected void doDraw(LockerState state, Canvas canvas){
+        switch(state){
+            case LOCKER_STATE_NORMAL:
+                mPaint.setStyle(Paint.Style.FILL);
+                mPaint.setColor(COLOR_NORMAL);
+			    canvas.drawCircle(mCenterX, mCenterY, mRadius * innerRate, mPaint);
+			break;
+            case LOCKER_STATE_SELECTED:
+                mPaint.setStyle(Paint.Style.STROKE);
+                mPaint.setColor(COLOR_NORMAL);
+                mPaint.setStrokeWidth(mRadius * outerWidthRate);
+			    canvas.drawCircle(mCenterX, mCenterY, mRadius * outerRate, mPaint);
+                mPaint.setStrokeWidth(2);
+			    canvas.drawCircle(mCenterX, mCenterY, mRadius * innerRate, mPaint);
+			break;
+            case LOCKER_STATE_ERROR:
+                mPaint.setStyle(Paint.Style.STROKE);
+                mPaint.setColor(COLOR_ERROR);
+                mPaint.setStrokeWidth(mRadius * outerWidthRate);
+			    canvas.drawCircle(mCenterX, mCenterY, mRadius * outerRate, mPaint);
+                mPaint.setStrokeWidth(2);
+			    canvas.drawCircle(mCenterX, mCenterY, mRadius * innerRate, mPaint);
+			break;
+		}
+    }
+    
+```
 
 
 ![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art1.png)
