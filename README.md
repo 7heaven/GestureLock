@@ -1,5 +1,4 @@
 #GestureLock
-===========
 
 ###GestureLock是一个可以自定义数量、自定义样式的手势解锁控件
 
@@ -8,7 +7,8 @@
 
 ##用法
 
-####使用GestureLock类提供的Adapter来定制样式
+使用GestureLock类提供的Adapter来定制样式
+
 ```java
     gestureView.setAdapter(new GestureLock.GestureLockAdapter() {
 
@@ -52,17 +52,16 @@
 ```getGestureLockViewInstance(Context context, int position) block的样式```
 
 
-####继承GestureLockView来实现自定义样式的block
+继承GestureLockView来实现自定义样式的block
 
-#####重写doArrowDraw绘制箭头(箭头角度0的时候为向上)
-
-#####重写onDraw实现Block内容样式的绘制
+* 重写doArrowDraw绘制箭头(箭头角度0的时候为向上)
+* 重写onDraw实现Block内容样式的绘制
 
 Block分为三种状态
 
-* LockerState.LOCKER_STATE_NORMAL 正常状态
-* LockerState.LOCKER_STATE_SELECTED 选中状态
-* LockerState.LOCKER_STATE_ERROR 错误状态
+* LockerState.LOCKER_STATE_NORMAL `正常状态`
+* LockerState.LOCKER_STATE_SELECTED `选中状态`
+* LockerState.LOCKER_STATE_ERROR `错误状态`
 
 
 ```java
