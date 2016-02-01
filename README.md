@@ -16,7 +16,7 @@
 
 			@Override
 			public int[] getCorrectGestures() {
-				return new int[]{0, 3, 6, 7, 8, 5, 2, 1, 4};
+				return new int[]{1, 2, 3, 4};
 			}
 
 			@Override
@@ -31,11 +31,7 @@
 
 			@Override
 			public GestureLockView getGestureLockViewInstance(Context context, int position) {
-				if(position % 2 == 0){
-					return new MyStyleLockView(context);
-				}else{
-					return new NexusStyleLockView(context);
-				}
+				return new NexusStyleLockView(context);
 			}
 		});	
 
