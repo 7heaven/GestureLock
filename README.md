@@ -4,18 +4,45 @@
 ###GestureLock是一个可以自定义数量、自定义样式的手势解锁控件
 
 ##用法
+
 ####使用GestureLock类提供的Adapter来定制样式
 
-```java
-public interface GestureLockAdapter{
-        int getDepth();
-        int[] getCorrectGestures();
-        int getUnmatchedBoundary();
-        int getBlockGapSize();
-        GestureLockView getGestureLockViewInstance(Context context, int position);
-  }```
+```java gestureView.setAdapter(new GestureLock.GestureLockAdapter() {
+			@Override
+			public int getDepth() {
+				return 3;
+			}
 
-<!--![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art1.png)
+			@Override
+			public int[] getCorrectGestures() {
+				return new int[]{1, 2, 3, 4};
+			}
+
+			@Override
+			public int getUnmatchedBoundary() {
+				return 5;
+			}
+
+			@Override
+			public int getBlockGapSize(){
+				return 10;
+			}
+
+			@Override
+			public GestureLockView getGestureLockViewInstance(Context context, int position) {
+				return new NexusStyleLockView(context);
+			}
+		});```
+  
+
+####getDepth() 手势解锁的宽高数量
+####getCorrectGestures() 正确的解锁手势
+####getUnmatchedBoundary() 最大可重试次数
+####getBlockGapSize() block之前的间隔大小
+####getGestureLockViewInstance(Context context, int position) block的样式
+
+
+![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art1.png)
 ![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art2.png)
 ![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art3.png)
 ![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art4.png)
@@ -26,4 +53,4 @@ public interface GestureLockAdapter{
 ![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art9.png)
 ![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art10.png)
 ![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art11.png)
-![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art12.png)-->
+![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art12.png)
