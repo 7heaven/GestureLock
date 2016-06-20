@@ -1,3 +1,6 @@
+![Hex.pm](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)
+[ ![Download](https://api.bintray.com/packages/7heaven/maven/GestureLock/images/download.svg) ](https://bintray.com/7heaven/maven/GestureLock/_latestVersion)
+
 #GestureLock
 
 ###GestureLock是一个可以自定义数量、自定义样式的手势解锁控件
