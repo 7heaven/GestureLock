@@ -4,7 +4,9 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.3.0'
+        classpath 'com.android.tools.build:gradle:2.1.2'
+        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.0'
+        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.3'
     }
 }
 
@@ -12,4 +14,25 @@ allprojects {
     repositories {
         jcenter()
     }
+}
+
+ext {
+    compileSdkVersion = 23
+    buildToolsVersion = "23.0.3"
+
+    minSdkVersion = 8
+    targetSdkVersion = 23
+    versionCode = 1001
+    versionName = "1.1"
+
+    pomPackaging = "aar"
+    pomName = "GestureLock"
+    pomLicenseName = "The Apache Software license, Version 2.0"
+    pomLicenseShort = "Apache-2.0"
+    pomLicenseUrl = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+
+    pomSiteUrl = "https://github.com/7heaven/GestureLock"
+    pomGitUrl = "https://github.com/7heaven/GestureLock.git"
+
+    pomGroup = "com.7heaven.widgets"
 }

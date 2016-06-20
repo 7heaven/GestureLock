@@ -42,14 +42,11 @@ case "`uname`" in
     ;;
 esac
 
-<<<<<<< HEAD
-=======
 # For Cygwin, ensure paths are in UNIX format before anything is touched.
 if $cygwin ; then
     [ -n "$JAVA_HOME" ] && JAVA_HOME=`cygpath --unix "$JAVA_HOME"`
 fi
 
->>>>>>> c6bf701cc2d329cc36c8e7fd07f6151111ff1b86
 # Attempt to set APP_HOME
 # Resolve links: $0 may be a link
 PRG="$0"
@@ -64,15 +61,9 @@ while [ -h "$PRG" ] ; do
     fi
 done
 SAVED="`pwd`"
-<<<<<<< HEAD
 cd "`dirname \"$PRG\"`/" >/dev/null
 APP_HOME="`pwd -P`"
 cd "$SAVED" >/dev/null
-=======
-cd "`dirname \"$PRG\"`/" >&-
-APP_HOME="`pwd -P`"
-cd "$SAVED" >&-
->>>>>>> c6bf701cc2d329cc36c8e7fd07f6151111ff1b86
 
 CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
 
@@ -123,10 +114,7 @@ fi
 if $cygwin ; then
     APP_HOME=`cygpath --path --mixed "$APP_HOME"`
     CLASSPATH=`cygpath --path --mixed "$CLASSPATH"`
-<<<<<<< HEAD
     JAVACMD=`cygpath --unix "$JAVACMD"`
-=======
->>>>>>> c6bf701cc2d329cc36c8e7fd07f6151111ff1b86
 
     # We build the pattern for arguments to be converted via cygpath
     ROOTDIRSRAW=`find -L / -maxdepth 1 -mindepth 1 -type d 2>/dev/null`
