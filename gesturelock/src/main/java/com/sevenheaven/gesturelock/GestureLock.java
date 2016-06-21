@@ -341,15 +341,9 @@ public class GestureLock extends ViewGroup {
                     if (gesturesContainer[0] != -1) {
                         boolean matched = false;
 
-                        int length = 0;
-                        for (int i : gesturesContainer) {
-                            if (i != -1) length++;
-                            else break;
-                        }
-
-                        if (length != defaultGestures.length)
+                        if (gesturesContainer.length > defaultGestures.length && gesturesContainer[defaultGestures.length] != -1) {
                             matched = false;
-                        else
+                        } else {
                             for (int j = 0; j < defaultGestures.length; j++) {
                                 if (gesturesContainer[j] == defaultGestures[j]) {
                                     matched = true;
@@ -358,6 +352,7 @@ public class GestureLock extends ViewGroup {
                                     break;
                                 }
                             }
+                        }
 
                         if (!matched && mode != MODE_EDIT) {
                             unmatchedCount++;
