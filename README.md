@@ -14,6 +14,7 @@
 
 ```
 compile 'com.7heaven.widgets:gesturelock:1.1'
+```
 
 使用GestureLock类提供的Adapter来定制样式
 
