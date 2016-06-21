@@ -5,7 +5,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -341,14 +340,24 @@ public class GestureLock extends ViewGroup {
 
                     if (gesturesContainer[0] != -1) {
                         boolean matched = false;
-                        for (int j = 0; j < defaultGestures.length; j++) {
-                            if (gesturesContainer[j] == defaultGestures[j]) {
-                                matched = true;
-                            } else {
-                                matched = false;
-                                break;
-                            }
+
+                        int length = 0;
+                        for (int i : gesturesContainer) {
+                            if (i != -1) length++;
+                            else break;
                         }
+
+                        if (length != defaultGestures.length)
+                            matched = false;
+                        else
+                            for (int j = 0; j < defaultGestures.length; j++) {
+                                if (gesturesContainer[j] == defaultGestures[j]) {
+                                    matched = true;
+                                } else {
+                                    matched = false;
+                                    break;
+                                }
+                            }
 
                         if (!matched && mode != MODE_EDIT) {
                             unmatchedCount++;
