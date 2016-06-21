@@ -341,9 +341,7 @@ public class GestureLock extends ViewGroup {
                     if (gesturesContainer[0] != -1) {
                         boolean matched = false;
 
-                        if (gesturesContainer.length > defaultGestures.length && gesturesContainer[defaultGestures.length] != -1) {
-                            matched = false;
-                        } else {
+                        if (gesturesContainer.length == defaultGestures.length || gesturesContainer[defaultGestures.length] == -1) {
                             for (int j = 0; j < defaultGestures.length; j++) {
                                 if (gesturesContainer[j] == defaultGestures[j]) {
                                     matched = true;
