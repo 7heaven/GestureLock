@@ -22,8 +22,8 @@ ext {
 
     minSdkVersion = 8
     targetSdkVersion = 23
-    versionCode = 1001
-    versionName = "1.1"
+    versionCode = 1002
+    versionName = "1.2"
 
     pomPackaging = "aar"
     pomName = "GestureLock"
