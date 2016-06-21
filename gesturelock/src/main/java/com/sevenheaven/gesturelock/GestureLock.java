@@ -125,6 +125,9 @@ public class GestureLock extends ViewGroup {
         for(int i = 0; i < negativeGestures.length; i++) negativeGestures[i] = -1;
         gesturesContainer = negativeGestures.clone();
         defaultGestures = mAdapter.getCorrectGestures();
+
+        if(defaultGestures.length > negativeGestures.length) throw new IllegalArgumentException("defaultGestures length must be less than or equal to " + negativeGestures.length);
+
         unmatchedBoundary = mAdapter.getUnmatchedBoundary();
     }
 
