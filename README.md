@@ -13,7 +13,7 @@
 ###gradle:
 
 ```
-compile 'com.7heaven.widgets:gesturelock:1.2'
+compile 'com.7heaven.widgets:gesturelock:1.3'
 ```
 
 使用GestureLock类提供的Adapter来定制样式
