@@ -8,7 +8,6 @@ import android.view.Menu;
 import android.widget.Toast;
 
 import com.example.gesturelock.widget.MyStyleLockView;
-import com.example.gesturelock.widget.NexusStyleLockView;
 import com.sevenheaven.gesturelock.GestureLock;
 import com.sevenheaven.gesturelock.GestureLockView;
 
@@ -25,12 +24,12 @@ public class MainActivity extends Activity {
 		gestureView.setAdapter(new GestureLock.GestureLockAdapter() {
 			@Override
 			public int getDepth() {
-				return 7;
+				return 3;
 			}
 
 			@Override
 			public int[] getCorrectGestures() {
-				return new int[]{0, 3, 6, 7, 8, 5, 2, 1, 4};
+				return new int[]{0, 1,2};
 			}
 
 			@Override
@@ -40,16 +39,17 @@ public class MainActivity extends Activity {
 
 			@Override
 			public int getBlockGapSize(){
-				return 10;
+				return 100;
 			}
 
 			@Override
 			public GestureLockView getGestureLockViewInstance(Context context, int position) {
-				if(position % 2 == 0){
+                return new MyStyleLockView(context);
+				/*if(position % 2 == 0){
 					return new MyStyleLockView(context);
 				}else{
 					return new NexusStyleLockView(context);
-				}
+				}*/
 			}
 		});
 
