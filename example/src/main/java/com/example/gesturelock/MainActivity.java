@@ -58,6 +58,7 @@ public class MainActivity extends Activity {
 			@Override
 			public void onGestureEvent(boolean matched) {
 				Toast.makeText(MainActivity.this, "Match:" + matched, Toast.LENGTH_SHORT).show();
+				gestureView.clear();
 			}
 
 			@Override
