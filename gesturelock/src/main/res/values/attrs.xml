@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="GestureLock">
+        <attr name="line_width" format="dimension"/>
+        <attr name="line_normal_color" format="color"/>
+        <attr name="line_error_color" format="color" />
+    </declare-styleable>
+</resources>
