@@ -10,7 +10,10 @@
     android:background="#555555" >
 
     <com.sevenheaven.gesturelock.GestureLock
+        xmlns:GestureLock="http://schemas.android.com/apk/res-auto"
         android:id="@+id/gesture_lock"
+        GestureLock:line_width="2dp"
+        GestureLock:line_normal_color="@android:color/darker_gray"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

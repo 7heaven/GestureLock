@@ -1,10 +1,12 @@
 package com.sevenheaven.gesturelock;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +48,11 @@ public class GestureLock extends ViewGroup {
 
     private boolean touchable;
 
+    private int DEFAULT_ERROR_COLOR = 0x66FF0000;
+    private int DEFAULT_COLOR = 0x66FFFFFF;
+    private int mCustomColor;
+    private int mCustomErrorColor;
+
     private OnGestureEventListener onGestureEventListener;
     private GestureLockAdapter mAdapter;
 
@@ -81,9 +88,15 @@ public class GestureLock extends ViewGroup {
         for(int i = 0; i < negativeGestures.length; i++) negativeGestures[i] = -1;
         gesturesContainer = negativeGestures.clone();
 
+        TypedArray ta = context.obtainStyledAttributes(attrs, R.styleable.GestureLock);
+        int lineWidth = ta.getDimensionPixelSize(R.styleable.GestureLock_line_width, (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 5, context.getResources().getDisplayMetrics()));
+        mCustomColor = ta.getColor(R.styleable.GestureLock_line_normal_color, DEFAULT_COLOR);
+        mCustomErrorColor = ta.getColor(R.styleable.GestureLock_line_error_color, DEFAULT_ERROR_COLOR);
+        ta.recycle();
+
         paint = new Paint(Paint.ANTI_ALIAS_FLAG);
         paint.setStyle(Paint.Style.STROKE);
-        paint.setStrokeWidth(20);
+        paint.setStrokeWidth(lineWidth);
         paint.setStrokeCap(Paint.Cap.ROUND);
         paint.setStrokeJoin(Paint.Join.ROUND);
 
@@ -294,7 +307,7 @@ public class GestureLock extends ViewGroup {
                     lastPathX = lastX;
                     lastPathY = lastY;
 
-                    paint.setColor(0x66FFFFFF);
+                    paint.setColor(mCustomColor);
 
                     break;
                 case MotionEvent.ACTION_MOVE:
@@ -357,7 +370,7 @@ public class GestureLock extends ViewGroup {
 
                         if (!matched && mode != MODE_EDIT) {
                             unmatchedCount++;
-                            paint.setColor(0x66FF0000);
+                            paint.setColor(mCustomErrorColor);
                             for (int k = 0; k < gesturesContainer.length; k++) {
                                 View selectedChild = findViewById(gesturesContainer[k] + 1);
                                 if (selectedChild != null && selectedChild instanceof GestureLockView) {
