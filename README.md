@@ -1,16 +1,16 @@
 ![Hex.pm](https://img.shields.io/hexpm/l/plug.svg?maxAge=2592000)
 [ ![Download](https://api.bintray.com/packages/7heaven/maven/GestureLock/images/download.svg) ](https://bintray.com/7heaven/maven/GestureLock/_latestVersion)
 
-#GestureLock
+# GestureLock
 
-###GestureLock是一个可以自定义数量、自定义样式的手势解锁控件
+### GestureLock是一个可以自定义数量、自定义样式的手势解锁控件
 
 ![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art4.png)
 ![](https://raw.githubusercontent.com/7heaven/GestureLock/master/art/art5.png)
 
-##用法
+## 用法
 
-###gradle:
+### gradle:
 
 ```
 compile 'com.7heaven.widgets:gesturelock:1.3'
