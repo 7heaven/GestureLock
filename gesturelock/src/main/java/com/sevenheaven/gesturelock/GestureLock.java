@@ -56,10 +56,15 @@ public class GestureLock extends ViewGroup {
     private OnGestureEventListener onGestureEventListener;
     private GestureLockAdapter mAdapter;
 
+    /**
+     * on MODE_EDIT mode, only onFinishGestureInput() & onBlockSelected() will be called
+     * on MODE_NORMAL mode, all function will be called
+     */
     public interface OnGestureEventListener{
         void onBlockSelected(int position);
         void onGestureEvent(boolean matched);
         void onUnmatchedExceedBoundary();
+        void onFinishGestureInput(int[] inputGestures);
     }
 
     /**
@@ -142,6 +147,14 @@ public class GestureLock extends ViewGroup {
         if(defaultGestures.length > negativeGestures.length) throw new IllegalArgumentException("defaultGestures length must be less than or equal to " + negativeGestures.length);
 
         unmatchedBoundary = mAdapter.getUnmatchedBoundary();
+    }
+
+    /**
+     * update correct gestures directly, not only by adapter define
+     * @param correctGestures
+     */
+    public void updateCorrectGestures(int[] correctGestures){
+        defaultGestures = correctGestures;
     }
 
     public void notifyDataChanged(){
@@ -357,6 +370,9 @@ public class GestureLock extends ViewGroup {
                     if (gesturesContainer[0] != -1) {
                         boolean matched = false;
 
+                        //本次输入串
+                        onGestureEventListener.onFinishGestureInput(gesturesContainer.clone());
+
                         if (gesturesContainer.length == defaultGestures.length || gesturesContainer[defaultGestures.length] == -1) {
                             for (int j = 0; j < defaultGestures.length; j++) {
                                 if (gesturesContainer[j] == defaultGestures[j]) {
@@ -392,12 +408,17 @@ public class GestureLock extends ViewGroup {
                             unmatchedCount = 0;
                         }
 
+                        if(mode != MODE_EDIT){
+                            unmatchedCount = 0;
+                        }
 
-                        if (onGestureEventListener != null) {
-                            onGestureEventListener.onGestureEvent(matched);
-                            if (unmatchedCount >= unmatchedBoundary) {
-                                onGestureEventListener.onUnmatchedExceedBoundary();
-                                unmatchedCount = 0;
+                        if(mode==MODE_NORMAL) {
+                            if (onGestureEventListener != null) {
+                                onGestureEventListener.onGestureEvent(matched);
+                                if (unmatchedCount >= unmatchedBoundary) {
+                                    onGestureEventListener.onUnmatchedExceedBoundary();
+                                    unmatchedCount = 0;
+                                }
                             }
                         }
                     }
