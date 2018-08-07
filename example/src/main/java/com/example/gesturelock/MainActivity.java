@@ -67,11 +67,26 @@ public class MainActivity extends Activity {
             }
 
             @Override
+            public void onFinishGestureInput(int[] inputGestures) {
+                String str = "";
+                for(int i=0; i<inputGestures.length; i++){
+                    str = str + String.valueOf(inputGestures[i]) + ", ";
+                }
+                Log.d("gestures", "inputGestures=" + str );
+
+                gestureView.clear();
+            }
+
+            @Override
             public void onBlockSelected(int position) {
                 Log.d("position", position + "");
             }
 
         });
+
+        //gestureView.updateCorrectGestures(new int[]{0, 1, 2});
+        gestureView.setMode(GestureLock.MODE_NORMAL);
+        //gestureView.setMode(GestureLock.MODE_EDIT);
     }
 
     @Override
